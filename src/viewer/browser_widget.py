@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QTo
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 import sys
 
+from themes.theme_1 import toggle_dark_mode
+
 def display_html_content(html_content):
     app = QApplication(sys.argv)
 
@@ -44,20 +46,6 @@ def display_html_content(html_content):
     sys.exit(app.exec_())
 
 
-def toggle_dark_mode(web_view, is_dark_mode):
-    script = f'''
-    var style = document.createElement('style');
-    style.textContent = `
-        body {{
-            background-color: {"#1e1e1e" if is_dark_mode else "#FFFFFF"};
-            color: {"#FFFFFF" if is_dark_mode else "#000000"};
-        }}
-        * {{
-            color: {"#FFFFFF" if is_dark_mode else "#000000"};
-        }}
-    `;
-    document.head.append(style);
-    '''
-    web_view.page().runJavaScript(script)
+
 
 

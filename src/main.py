@@ -1,6 +1,6 @@
 import sys
 import subprocess
-from themes.browser_widget import display_html_content
+from viewer.browser_widget import display_html_content
 
 NETCACHE = "/home/parallels/Documents/offpunk/netcache.py"
 
