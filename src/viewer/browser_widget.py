@@ -1,18 +1,21 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QToolBar, QAction
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-import sys
+from PyQt5.QtCore import QUrl
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMainWindow, QToolBar, QAction
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 
-from themes.theme_1 import toggle_dark_mode
 
-def display_html_content(html_content):
-    app = QApplication(sys.argv)
-
-    window = QMainWindow()
-    window.setWindowTitle("UnifiedText")
-    window.setGeometry(100, 100, 800, 600)
-
+def display_html_content(html_content, url, callback=None, main_window=None):
     web_view = QWebEngineView()
-    web_view.setHtml(html_content)
+
+    class CustomWebEnginePage(QWebEnginePage):
+        def acceptNavigationRequest(self, url, _type, is_main_frame):
+            if is_main_frame and _type == QWebEnginePage.NavigationTypeLinkClicked:
+                if callback:
+                    callback(url.toString())
+                return False
+            return super().acceptNavigationRequest(url, _type, is_main_frame)
+
+    web_view.setPage(CustomWebEnginePage(web_view))
+    web_view.setHtml(html_content, baseUrl=QUrl(url))
 
     layout = QVBoxLayout()
     layout.addWidget(web_view)
@@ -20,32 +23,9 @@ def display_html_content(html_content):
     central_widget = QWidget()
     central_widget.setLayout(layout)
 
-    window.setCentralWidget(central_widget)
+    main_window.setCentralWidget(central_widget)
 
-    # toolbar
-    nav_toolbar = QToolBar()
-    back_action = QAction("<", window)
-    back_action.triggered.connect(web_view.back)
-    forward_action = QAction(">", window)
-    forward_action.triggered.connect(web_view.forward)
-    # refresh_action = QAction("Refresh", window)
-    # refresh_action.triggered.connect(web_view.reload)
-    dark_mode_action = QAction("Dark", window)
-    dark_mode_action.triggered.connect(lambda: toggle_dark_mode(web_view, True))
-    normal_mode_action = QAction("Normal", window)
-    normal_mode_action.triggered.connect(lambda: toggle_dark_mode(web_view, False))
-    nav_toolbar.addAction(back_action)
-    nav_toolbar.addAction(forward_action)
-    # nav_toolbar.addAction(refresh_action)
-    nav_toolbar.addAction(dark_mode_action)
-    nav_toolbar.addAction(normal_mode_action)
-    window.addToolBar(nav_toolbar)
+  
+    main_window.show()
 
-    window.show()
-
-    sys.exit(app.exec_())
-
-
-
-
-
+    return web_view
