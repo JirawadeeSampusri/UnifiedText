@@ -8,6 +8,7 @@ from PyQt5.QtCore import QUrl, QTimer
 
 NETCACHE = "/home/parallels/Documents/offpunk/netcache.py"
 
+
 class HTMLContentFetcher:
     @staticmethod
     def fetch_direct(url):
@@ -23,23 +24,35 @@ class HTMLContentFetcher:
         try:
             result = subprocess.run([NETCACHE, url], capture_output=True, text=True, check=True)
             html_content = result.stdout.strip()
-            print("Content from", url)
-            print(html_content)
-            return html_content
+
+            timestamp_result = subprocess.run([NETCACHE, url, "--timestamp"], capture_output=True, text=True,
+                                              check=True)
+            timestamp = timestamp_result.stdout.strip()
+            print("Timestamp:", timestamp)
+
+            return html_content, True 
         except subprocess.CalledProcessError as e:
             print("Error executing command:", e)
-            return None
+            return None, False  
+
+
+def fetch_content(url):
+    html_content = HTMLContentFetcher.fetch_direct(url)
+    if not html_content:
+        html_content, _ = HTMLContentFetcher.fetch_from_cache(url)
+    return html_content
+
 
 def handle_link_click(url, main_window):
     global web_view
-    html_content = HTMLContentFetcher.fetch_direct(url)
-    if not html_content:
-        html_content = HTMLContentFetcher.fetch_from_cache(url)
+    print("Fetching content for", url)
+    html_content = fetch_content(url)
     if html_content:
         if not web_view:
             create_web_view(html_content, url, main_window)
         else:
             web_view.setHtml(html_content, baseUrl=QUrl(url))
+
 
 def create_web_view(html_content, url, main_window):
     global web_view
@@ -47,17 +60,22 @@ def create_web_view(html_content, url, main_window):
     ThemeSwitcher.set_web_view(web_view)
     web_view.loadFinished.connect(apply_theme)
 
+
 def apply_theme():
     QTimer.singleShot(0, ThemeSwitcher.apply_theme)
+
 
 def toggle_theme():
     ThemeSwitcher.toggle_dark_mode()
 
+
 def back():
     web_view.page().triggerAction(QWebEnginePage.Back)
 
+
 def forward():
     web_view.page().triggerAction(QWebEnginePage.Forward)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -86,10 +104,11 @@ if __name__ == "__main__":
     toolbar.addAction(theme_action)
 
     # Initial Setting
-    is_dark_mode = False 
-    web_view = None  
+    is_dark_mode = False
+    web_view = None
 
     handle_link_click(url, main_window)
     main_window.show()
 
     sys.exit(app.exec_())
+
