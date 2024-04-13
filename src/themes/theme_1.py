@@ -1,3 +1,4 @@
+
 class ThemeSwitcher:
     is_dark_mode = False
     web_view = None
@@ -28,3 +29,5 @@ class ThemeSwitcher:
                 document.head.append(style);
             '''
             ThemeSwitcher.web_view.page().runJavaScript(script)
+
+

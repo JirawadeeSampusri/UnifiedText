@@ -40,3 +40,6 @@ def display_html_content(html_content, url, callback=None, main_window=None):
     main_window.show()
 
     return web_view
+
+
+
