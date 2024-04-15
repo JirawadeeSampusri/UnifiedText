@@ -1,4 +1,3 @@
-
 class ThemeSwitcher:
     is_dark_mode = False
     web_view = None

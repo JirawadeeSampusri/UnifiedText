@@ -35,7 +35,7 @@ def display_html_content(html_content, url, callback=None, main_window=None):
 
     main_window.setStyleSheet("background-color: #2C3E50; color: #ECF0F1;")
     main_window.setWindowIcon(QIcon("icon.png")) 
-    main_window.setWindowTitle("UnifiedText")  
+    main_window.setWindowTitle(f"UnifiedText")
 
     main_window.show()
 
