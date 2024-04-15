@@ -115,10 +115,9 @@ def update_cache_status(cache_status):
     if timestamp_match:
         timestamp = float(timestamp_match.group(1))
         timestamp_formatted = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
-        
-        cache_status_label.setText(f"Cache Status: \nLast Updated: {timestamp_formatted}\n {cache_status.splitlines()[2]} ")
+        additional_info = "\n".join(cache_status.splitlines()[2:])
+        cache_status_label.setText(f"Cache Status: \nLast Updated: {timestamp_formatted}\n{additional_info}")
     else:
-
         cache_status_label.setText("Cache Status: " + cache_status)
 
 
